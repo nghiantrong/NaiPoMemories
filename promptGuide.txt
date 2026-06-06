@@ -1,0 +1,631 @@
+# ROLE
+
+You are a Senior React Native Engineer, Mobile Architect, and Technical Lead.
+
+Your task is to build a production-quality MVP React Native application using Expo and TypeScript.
+
+The application is inspired by Locket, but with support for both photos and short videos.
+
+The project is currently for local testing only.
+
+Do NOT deploy anything.
+
+Do NOT configure production environments.
+
+Focus on architecture, maintainability, scalability, and clean code.
+
+---
+
+# PROJECT OVERVIEW
+
+Build a mobile application similar to Locket.
+
+Users can:
+
+* Register
+* Login
+* Logout
+* Search for other users
+* Send friend requests
+* Accept/reject friend requests
+* Become connected with another user
+* Capture photos
+* Record short videos
+* Upload media
+* Share media with connected friends
+* View friends' latest posts in a feed
+
+Unlike Locket:
+
+Users can upload videos up to 1-2 minutes long.
+
+---
+
+# TECH STACK
+
+Use:
+
+* React Native
+* Expo
+* TypeScript
+* Expo Router
+* TanStack React Query
+* Zustand
+* React Hook Form
+* Zod
+* Axios
+
+---
+
+# BACKEND DECISION
+
+Choose the most practical free MVP stack.
+
+Preferred architecture:
+
+Authentication:
+Firebase Authentication
+
+Database:
+Firestore
+
+Media Storage:
+Cloudinary
+
+Reason:
+
+* Firebase Auth is simple and reliable
+* Firestore is sufficient for MVP social apps
+* Cloudinary handles images and videos better than Firebase Storage
+* Free tier is enough for development/testing
+
+If you believe another free solution is significantly better, explain why before implementation.
+
+---
+
+# IMPORTANT ARCHITECTURE RULES
+
+This project must NOT look like a tutorial project.
+
+This project must be organized like a real-world company project.
+
+Business logic must be separated.
+
+UI must remain clean.
+
+Screens must not directly talk to Firebase.
+
+Screens must not directly talk to Cloudinary.
+
+No massive components with hundreds of lines.
+
+Apply Separation of Concerns.
+
+Apply Clean Architecture principles.
+
+Apply SOLID principles when appropriate.
+
+---
+
+# FOLDER STRUCTURE
+
+Use a scalable feature-based architecture.
+
+src/
+
+app/
+components/
+layouts/
+features/
+hooks/
+services/
+repositories/
+store/
+types/
+constants/
+utils/
+lib/
+theme/
+
+---
+
+# FEATURE STRUCTURE
+
+Organize by feature.
+
+Example:
+
+features/
+
+auth/
+friends/
+posts/
+profile/
+
+Each feature should contain:
+
+components/
+hooks/
+services/
+repositories/
+types/
+
+when necessary.
+
+---
+
+# DATA FLOW
+
+Must follow:
+
+Screen
+
+↓
+
+Hook
+
+↓
+
+Service
+
+↓
+
+Repository
+
+↓
+
+Firebase / Cloudinary
+
+Never bypass this flow.
+
+---
+
+# REPOSITORY LAYER
+
+Create repositories.
+
+Examples:
+
+AuthRepository
+UserRepository
+FriendRepository
+PostRepository
+MediaRepository
+
+Repository layer handles:
+
+* Firebase Auth
+* Firestore
+* Cloudinary API
+
+Repositories are the only layer allowed to communicate with external services.
+
+---
+
+# SERVICE LAYER
+
+Create services.
+
+Examples:
+
+AuthService
+FriendService
+PostService
+MediaService
+
+Services handle:
+
+* business logic
+* validation
+* orchestration
+* repository calls
+
+UI must never contain business logic.
+
+---
+
+# AUTHENTICATION
+
+Implement:
+
+Register
+
+Fields:
+
+* email
+* password
+* displayName
+
+Login
+
+Fields:
+
+* email
+* password
+
+Logout
+
+Persist Login
+
+User remains authenticated after app restart.
+
+---
+
+# USER MODEL
+
+users collection
+
+User
+
+{
+id: string
+email: string
+displayName: string
+avatarUrl?: string
+createdAt: Timestamp
+}
+
+---
+
+# FRIEND SYSTEM
+
+Users can search another user by email.
+
+Users can send friend requests.
+
+friendRequests collection
+
+{
+id
+senderId
+receiverId
+status
+createdAt
+}
+
+status:
+
+* pending
+* accepted
+* rejected
+
+When accepted:
+
+friendships collection
+
+{
+id
+user1Id
+user2Id
+createdAt
+}
+
+Validation:
+
+* cannot add self
+* cannot send duplicate requests
+* cannot create duplicate friendships
+
+---
+
+# CAMERA
+
+Use Expo Camera.
+
+Support:
+
+* Photo capture
+* Video recording
+
+Video duration:
+
+Maximum 120 seconds
+
+Reject longer videos.
+
+---
+
+# MEDIA UPLOAD
+
+Use Cloudinary.
+
+Create:
+
+services/media.service.ts
+
+repositories/media.repository.ts
+
+Do not hardcode credentials.
+
+Everything must come from environment variables.
+
+---
+
+# CLOUDINARY ENV
+
+EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME=
+
+EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET=
+
+---
+
+# POST MODEL
+
+posts collection
+
+{
+id
+userId
+mediaType
+mediaUrl
+thumbnailUrl
+caption
+createdAt
+}
+
+mediaType:
+
+* image
+* video
+
+---
+
+# FEED
+
+Feed should display:
+
+* my own posts
+* friends' posts
+
+Sorted:
+
+newest first
+
+---
+
+# NAVIGATION
+
+Use Expo Router.
+
+(auth)
+
+login
+register
+
+(app)
+
+tabs
+
+feed
+camera
+friends
+profile
+
+Protected routes required.
+
+Unauthenticated users must be redirected to Login.
+
+---
+
+# STATE MANAGEMENT
+
+Use Zustand only for:
+
+* auth state
+* user state
+* app state
+
+Use React Query for:
+
+* users
+* posts
+* friend requests
+* friendships
+
+Do not misuse Zustand for server data.
+
+---
+
+# FORMS
+
+Use:
+
+React Hook Form
+
+Validation:
+
+Zod
+
+Register:
+
+* valid email
+* password minimum 6 chars
+
+Login:
+
+* valid email
+* password minimum 6 chars
+
+---
+
+# UI ARCHITECTURE
+
+Separate:
+
+layouts/
+components/
+screens/
+
+Create reusable components:
+
+Button
+Input
+Avatar
+Loader
+ErrorState
+EmptyState
+ScreenContainer
+Header
+
+Avoid duplicated UI code.
+
+---
+
+# DESIGN SYSTEM
+
+Create:
+
+theme/
+
+colors.ts
+spacing.ts
+typography.ts
+shadows.ts
+
+Centralize all design tokens.
+
+Do not hardcode colors everywhere.
+
+The actual UI design will come from Stitch later.
+
+Prepare the project so Stitch-generated UI can be integrated easily.
+
+---
+
+# ERROR HANDLING
+
+Create a centralized error system.
+
+Examples:
+
+AppError
+ValidationError
+FirebaseError
+
+Show user-friendly messages.
+
+Avoid random console.log calls.
+
+---
+
+# REACT QUERY
+
+Create query keys.
+
+Example:
+
+queryKeys.ts
+
+AUTH
+POSTS
+FRIENDS
+PROFILE
+
+Avoid unnecessary useEffect fetching.
+
+Use React Query properly.
+
+---
+
+# TYPESCRIPT
+
+Enable strict mode.
+
+Avoid any.
+
+Create dedicated types:
+
+auth.types.ts
+user.types.ts
+friend.types.ts
+post.types.ts
+
+Do not define large interfaces inside screens.
+
+---
+
+# CONFIGURATION
+
+lib/
+
+firebase.ts
+
+constants/
+
+queryKeys.ts
+routes.ts
+storageKeys.ts
+
+utils/
+
+date.utils.ts
+validation.utils.ts
+
+---
+
+# ENVIRONMENT VARIABLES
+
+Create:
+
+.env.example
+
+Include:
+
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+
+EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME=
+EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET=
+
+Add .env to .gitignore.
+
+Never expose secrets in source code.
+
+---
+
+# README
+
+Create a detailed README.md.
+
+Include:
+
+1. Project overview
+2. Architecture explanation
+3. Folder structure explanation
+4. Firebase setup
+5. Cloudinary setup
+6. Environment setup
+7. How to run locally
+8. Authentication flow
+9. Friend request flow
+10. Media upload flow
+11. Feed flow
+12. Future scalability considerations
+
+Write step-by-step instructions.
+
+Assume the reader is a junior developer.
+
+---
+
+# DELIVERABLES
+
+Generate:
+
+1. Full source code
+2. Folder structure
+3. All required files
+4. README.md
+5. .env.example
+6. Installation guide
+7. Local run guide
+
+Before generating code:
+
+First provide the proposed architecture and folder structure.
+
+After architecture approval, proceed with implementation.
