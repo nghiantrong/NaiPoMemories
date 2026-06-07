@@ -54,7 +54,7 @@ export function PostCard({ post, authorStreak = 0 }: PostCardProps) {
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>
             {author?.displayName ?? '...'}
-            {authorStreak > 0 ? ` 🔥 ${authorStreak}` : ''}
+            {authorStreak > 0 && <Text style={styles.streakText}> 🔥 {authorStreak}</Text>}
           </Text>
           <Text style={styles.timestamp}>{timeAgo(post.createdAt)}</Text>
         </View>
