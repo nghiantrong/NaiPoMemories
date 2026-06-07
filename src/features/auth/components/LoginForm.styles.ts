@@ -22,9 +22,9 @@ export const styles = StyleSheet.create({
   heroContainer: {
     width: '100%',
     overflow: 'hidden',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.xl,
   },
   heroImage: {
     ...StyleSheet.absoluteFillObject,
@@ -33,18 +33,24 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  logoBox: {
-    width: 72,
-    height: 72,
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
+  logoWrapper: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: 'white',
     justifyContent: 'center',
-    transform: [{ rotate: '3deg' }],
-    ...shadows.shutterGlow,
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
-  logoEmoji: {
-    fontSize: 36,
+  logoImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    resizeMode: 'cover',
   },
   appName: {
     ...typography.headlineLg,

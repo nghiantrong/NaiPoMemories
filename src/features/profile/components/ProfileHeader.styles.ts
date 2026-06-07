@@ -13,6 +13,22 @@ export const styles = StyleSheet.create({
     gap: spacing.md,
     backgroundColor: colors.background,
   },
+  backButton: {
+    position: 'absolute',
+    left: spacing.screenPaddingHorizontal,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surfaceContainerLowest,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.sm,
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: colors.onSurface,
+  },
 
   // Avatar — Stitch: w-32 h-32 p-1.5 bg-white matcha-shadow
   avatarWrapper: {

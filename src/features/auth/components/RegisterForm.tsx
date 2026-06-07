@@ -1,25 +1,22 @@
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { BlurView } from 'expo-blur';
 import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
+  Image,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRegister } from '../hooks/useRegister';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
-import { typography } from '@/theme/typography';
-import { spacing, borderRadius } from '@/theme/spacing';
-import { shadows } from '@/theme/shadows';
 import { styles } from './RegisterForm.styles';
 
 const registerSchema = z
@@ -58,7 +55,7 @@ export function RegisterForm({ onNavigateToLogin }: RegisterFormProps) {
 
   const onSubmit = async (data: RegisterSchema) => {
     reset();
-    await register(data).catch(() => {});
+    await register(data).catch(() => { });
   };
 
   const insets = useSafeAreaInsets();
@@ -69,131 +66,134 @@ export function RegisterForm({ onNavigateToLogin }: RegisterFormProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={insets.top}
     >
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="interactive"
-    >
-      {/* ── Top section ── */}
-      <View style={styles.topSection}>
-        <View style={styles.logoBox}>
-          <Text style={styles.logoEmoji}>✨</Text>
-        </View>
-        <Text style={styles.appName}>NaiPoMemories</Text>
-        <Text style={styles.tagline}>Ghi lại từng khoảnh khắc đáng nhớ</Text>
-      </View>
-
-      {/* ── Glass Panel ── */}
-      <View style={styles.glassWrapper}>
-        <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
-        <View style={styles.glassContent}>
-          <View style={styles.headingGroup}>
-            <Text style={styles.heading}>Tạo tài khoản ✨</Text>
-            <Text style={styles.subheading}>
-              Tham gia cùng bạn bè trên NaiPoMemories
-            </Text>
-          </View>
-
-          <View style={styles.fields}>
-            <Controller
-              control={control}
-              name="displayName"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label="Tên hiển thị"
-                  placeholder="Tên của bạn"
-                  autoCapitalize="words"
-                  autoComplete="name"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.displayName?.message}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label="Email"
-                  placeholder="you@example.com"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.email?.message}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label="Mật khẩu"
-                  placeholder="Tối thiểu 6 ký tự"
-                  secureTextEntry={!showPassword}
-                  autoComplete="new-password"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.password?.message}
-                  rightIcon={
-                    <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
-                  }
-                  onRightIconPress={() => setShowPassword((p) => !p)}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="confirmPassword"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label="Xác nhận mật khẩu"
-                  placeholder="Nhập lại mật khẩu"
-                  secureTextEntry={!showPassword}
-                  autoComplete="new-password"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.confirmPassword?.message}
-                />
-              )}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+      >
+        {/* ── Top section ── */}
+        <View style={styles.topSection}>
+          <View style={styles.logoWrapper}>
+            <Image
+              source={{ uri: 'https://lh3.googleusercontent.com/aida/AP1WRLt_5nkeclwwXSRcLfjbMMXCpUh6WTFaYLMbycaKYqKhHwGkl9ysc0Js6CyWzzIMi65LooPXqNfW5ltX3VzWIUgq6AmuZYucdVReiYUXLI7KnmKPShN56O15cXQFeY-DjSJdJOQ0iVWQI8cWe2sp06_O1SGmC150B2wLN3ZBhujpm_TUo6eq4Rt8-Rjpj05bC80u9zsAuwfq5UyedX8qH7-2CWVpjmwRDexW5YJ4qDdMK6XmwFeTNqB74p56' }}
+              style={styles.logoImage}
             />
           </View>
-
-          {error && <Text style={styles.serverError}>{error}</Text>}
-
-          <Button
-            label="Tạo tài khoản"
-            onPress={handleSubmit(onSubmit)}
-            isLoading={isLoading}
-            fullWidth
-            size="lg"
-          />
-
-          <Pressable onPress={onNavigateToLogin} style={styles.loginRow}>
-            <Text style={styles.loginText}>
-              Đã có tài khoản?{' '}
-              <Text style={styles.loginLink}>Đăng nhập</Text>
-            </Text>
-          </Pressable>
+          <Text style={styles.appName}>NaiPoMemories</Text>
+          <Text style={styles.tagline}>Ghi lại từng khoảnh khắc đáng nhớ</Text>
         </View>
-      </View>
 
-      {/* Decorative blobs */}
-      <View style={styles.blobBottomLeft} />
-      <View style={styles.blobTopRight} />
-    </ScrollView>
+        {/* ── Glass Panel ── */}
+        <View style={styles.glassWrapper}>
+          <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
+          <View style={styles.glassContent}>
+            <View style={styles.headingGroup}>
+              <Text style={styles.heading}>Tạo tài khoản ✨</Text>
+              <Text style={styles.subheading}>
+                Tham gia cùng bạn bè trên NaiPoMemories
+              </Text>
+            </View>
+
+            <View style={styles.fields}>
+              <Controller
+                control={control}
+                name="displayName"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    label="Tên hiển thị"
+                    placeholder="Tên của bạn"
+                    autoCapitalize="words"
+                    autoComplete="name"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.displayName?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    label="Email"
+                    placeholder="you@example.com"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.email?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    label="Mật khẩu"
+                    placeholder="Tối thiểu 6 ký tự"
+                    secureTextEntry={!showPassword}
+                    autoComplete="new-password"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.password?.message}
+                    rightIcon={
+                      <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+                    }
+                    onRightIconPress={() => setShowPassword((p) => !p)}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    label="Xác nhận mật khẩu"
+                    placeholder="Nhập lại mật khẩu"
+                    secureTextEntry={!showPassword}
+                    autoComplete="new-password"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.confirmPassword?.message}
+                  />
+                )}
+              />
+            </View>
+
+            {error && <Text style={styles.serverError}>{error}</Text>}
+
+            <Button
+              label="Tạo tài khoản"
+              onPress={handleSubmit(onSubmit)}
+              isLoading={isLoading}
+              fullWidth
+              size="lg"
+            />
+
+            <Pressable onPress={onNavigateToLogin} style={styles.loginRow}>
+              <Text style={styles.loginText}>
+                Đã có tài khoản?{' '}
+                <Text style={styles.loginLink}>Đăng nhập</Text>
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Decorative blobs */}
+        <View style={styles.blobBottomLeft} />
+        <View style={styles.blobTopRight} />
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

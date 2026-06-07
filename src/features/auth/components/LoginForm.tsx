@@ -75,7 +75,7 @@ export function LoginForm({ onNavigateToRegister }: LoginFormProps) {
       {/* ── Hero Header ── */}
       <View style={[styles.heroContainer, { height: HERO_HEIGHT }]}>
         <Image
-          source={{ uri: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=80' }}
+          source={{ uri: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80' }}
           style={styles.heroImage}
           resizeMode="cover"
         />
@@ -86,8 +86,11 @@ export function LoginForm({ onNavigateToRegister }: LoginFormProps) {
 
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoEmoji}>🍃</Text>
+          <View style={styles.logoWrapper}>
+            <Image
+              source={{ uri: 'https://lh3.googleusercontent.com/aida/AP1WRLt_5nkeclwwXSRcLfjbMMXCpUh6WTFaYLMbycaKYqKhHwGkl9ysc0Js6CyWzzIMi65LooPXqNfW5ltX3VzWIUgq6AmuZYucdVReiYUXLI7KnmKPShN56O15cXQFeY-DjSJdJOQ0iVWQI8cWe2sp06_O1SGmC150B2wLN3ZBhujpm_TUo6eq4Rt8-Rjpj05bC80u9zsAuwfq5UyedX8qH7-2CWVpjmwRDexW5YJ4qDdMK6XmwFeTNqB74p56' }}
+              style={styles.logoImage}
+            />
           </View>
           <Text style={styles.appName}>NaiPoMemories</Text>
         </View>

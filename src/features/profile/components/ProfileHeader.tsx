@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, borderRadius } from '@/theme/spacing';
@@ -23,9 +24,18 @@ export function ProfileHeader({
   onEditPress,
 }: ProfileHeaderProps) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.lg }]}>
+      {/* ── Back button ── */}
+      <Pressable 
+        onPress={() => router.back()} 
+        style={[styles.backButton, { top: insets.top + spacing.sm }]}
+      >
+        <Text style={styles.backButtonText}>←</Text>
+      </Pressable>
+
       {/* ── Avatar with ring + edit badge (Stitch: w-32 h-32 ring-4 ring-primary-container) ── */}
       <View style={styles.avatarWrapper}>
         {/* White halo */}

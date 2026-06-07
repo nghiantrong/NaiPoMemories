@@ -8,7 +8,8 @@ import { CameraView as ExpoCameraView } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Svg, { Circle } from 'react-native-svg';
 import {
   Alert,
   Image,
@@ -17,6 +18,8 @@ import {
   Text,
   TextInput,
   View,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCamera } from '../hooks/useCamera';
@@ -31,6 +34,25 @@ export function CameraView() {
   const { createPost, isLoading: isPosting, uploadProgress } = useCreatePost();
   const [caption, setCaption] = useState('');
   const [flash, setFlash] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (camera.isRecording) {
+      interval = setInterval(() => {
+        setRecordingSeconds((s) => s + 1);
+      }, 1000);
+    } else {
+      setRecordingSeconds(0);
+    }
+    return () => clearInterval(interval);
+  }, [camera.isRecording]);
+
+  const formatTime = (totalSeconds: number) => {
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   const player = useVideoPlayer(
     camera.capturedMedia?.type === 'video' ? camera.capturedMedia.uri : null,
@@ -74,49 +96,51 @@ export function CameraView() {
     };
 
     return (
-      <View style={styles.previewContainer}>
-        {camera.capturedMedia.type === 'video' ? (
-          <VideoView
-            player={player}
-            style={styles.preview}
-            contentFit="cover"
-          />
-        ) : (
-          <Image
-            source={{ uri: camera.capturedMedia.uri }}
-            style={styles.preview}
-            resizeMode="cover"
-          />
-        )}
-        <View style={[styles.previewOverlay, { paddingBottom: insets.bottom + spacing.lg }]}>
-          <TextInput
-            style={styles.captionInput}
-            placeholder="Thêm chú thích..."
-            placeholderTextColor="rgba(255,255,255,0.6)"
-            value={caption}
-            onChangeText={setCaption}
-            multiline
-            maxLength={200}
-          />
-          {uploadProgress !== null && (
-            <Text style={styles.progressText}>Đang tải... {uploadProgress}%</Text>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.previewContainer}>
+          {camera.capturedMedia.type === 'video' ? (
+            <VideoView
+              player={player}
+              style={styles.preview}
+              contentFit="cover"
+            />
+          ) : (
+            <Image
+              source={{ uri: camera.capturedMedia.uri }}
+              style={styles.preview}
+              resizeMode="cover"
+            />
           )}
-          <View style={styles.previewActions}>
-            <Button
-              label="Hủy"
-              variant="ghost"
-              onPress={camera.discardMedia}
-              style={styles.discardBtn}
+          <View style={[styles.previewOverlay, { paddingBottom: insets.bottom + spacing.lg }]}>
+            <TextInput
+              style={styles.captionInput}
+              placeholder="Thêm chú thích..."
+              placeholderTextColor="rgba(255,255,255,0.6)"
+              value={caption}
+              onChangeText={setCaption}
+              multiline
+              maxLength={200}
             />
-            <Button
-              label="Chia sẻ ✨"
-              onPress={handlePost}
-              isLoading={isPosting}
-              style={styles.shareBtn}
-            />
+            {uploadProgress !== null && (
+              <Text style={styles.progressText}>Đang tải... {uploadProgress}%</Text>
+            )}
+            <View style={styles.previewActions}>
+              <Button
+                label="Hủy"
+                variant="ghost"
+                onPress={camera.discardMedia}
+                style={styles.discardBtn}
+              />
+              <Button
+                label="Chia sẻ ✨"
+                onPress={handlePost}
+                isLoading={isPosting}
+                style={styles.shareBtn}
+              />
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 
@@ -131,6 +155,8 @@ export function CameraView() {
         style={StyleSheet.absoluteFill}
         facing={camera.facing}
         mode={camera.mode === 'photo' ? 'picture' : 'video'}
+        enableTorch={flash}
+        flash={flash ? 'on' : 'off'}
       />
 
       {/* Grid overlay (Stitch: 2 vertical + 2 horizontal at 33% opacity 10%) */}
@@ -158,9 +184,11 @@ export function CameraView() {
           <Text style={styles.topIconText}>{flash ? '⚡' : '🔦'}</Text>
         </Pressable>
 
-        {/* Brand pill — Stitch: "MOMENTS" text center */}
+        {/* Brand pill — Stitch: "MOMENTS" text center or Timer */}
         <View style={styles.brandPill}>
-          <Text style={styles.brandText}>MOMENTS</Text>
+          <Text style={[styles.brandText, camera.isRecording && { color: colors.error, opacity: 1, letterSpacing: 2 }]}>
+            {camera.isRecording ? formatTime(recordingSeconds) : 'MOMENTS'}
+          </Text>
         </View>
 
         {/* Close / back */}
@@ -253,6 +281,26 @@ export function CameraView() {
               pressed && { transform: [{ scale: 0.92 }] },
             ]}
           >
+            {/* Progress Ring for Video */}
+            {camera.isRecording && camera.mode === 'video' && (
+              <Svg
+                height="100"
+                width="100"
+                style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}
+              >
+                <Circle
+                  cx="50"
+                  cy="50"
+                  r="46"
+                  stroke={colors.error}
+                  strokeWidth="4"
+                  fill="transparent"
+                  strokeDasharray={2 * Math.PI * 46}
+                  strokeDashoffset={(2 * Math.PI * 46) * (1 - recordingSeconds / 120)}
+                />
+              </Svg>
+            )}
+
             <View
               style={[
                 styles.shutterInner,
