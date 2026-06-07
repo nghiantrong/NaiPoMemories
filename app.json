@@ -8,9 +8,11 @@
     "scheme": "naipomemories",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/appIcon.png",
+      "bundleIdentifier": "com.naipo.naipomemories"
     },
     "android": {
+      "package": "com.naipo.naipomemories",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
