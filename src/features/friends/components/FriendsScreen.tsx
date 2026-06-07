@@ -172,9 +172,9 @@ export function FriendsScreen() {
             data={friends}
             keyExtractor={(f) => f.friendshipId}
             renderItem={({ item }) => <FriendCard friend={item} />}
-            ListHeaderComponent={renderHeader}
-            ListEmptyComponent={renderEmpty}
-            ListFooterComponent={renderFooter}
+            ListHeaderComponent={renderHeader()}
+            ListEmptyComponent={renderEmpty()}
+            ListFooterComponent={renderFooter()}
             contentContainerStyle={[
               styles.list,
               { paddingTop: appBarHeight + spacing.sm, paddingBottom: 120 + insets.bottom },
