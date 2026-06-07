@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Pressable } from 'react-native';
 import { Post } from '../types/post.types';
 import { colors } from '@/theme/colors';
@@ -9,6 +9,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { timeAgo } from '@/utils/date.utils';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { BlurView } from 'expo-blur';
+import { useVideoPlayer, VideoView } from 'expo-video';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_IMAGE_SIZE = SCREEN_WIDTH - spacing.screenPaddingHorizontal * 2;
@@ -19,6 +20,32 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   const { data: author } = useProfile(post.userId);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const isVideo = post.mediaType === 'video';
+  const player = useVideoPlayer(
+    isVideo ? post.mediaUrl : null,
+    (p) => {
+      p.loop = true;
+      p.muted = false; // default unmuted
+    }
+  );
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      player.pause();
+      setIsPlaying(false);
+    } else {
+      player.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const toggleMute = () => {
+    player.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
 
   return (
     <View style={styles.card}>
@@ -36,11 +63,29 @@ export function PostCard({ post }: PostCardProps) {
 
       {/* ── Media (1:1 square) ── */}
       <View style={styles.mediaWrapper}>
-        <Image
-          source={{ uri: post.thumbnailUrl ?? post.mediaUrl }}
-          style={styles.media}
-          resizeMode="cover"
-        />
+        {isVideo ? (
+          <Pressable style={styles.media} onPress={togglePlay}>
+            <VideoView
+              player={player}
+              style={styles.media}
+              contentFit="cover"
+            />
+            {!isPlaying && (
+              <View style={styles.playOverlay}>
+                <Text style={styles.playIcon}>▶️</Text>
+              </View>
+            )}
+            <Pressable style={styles.muteBtn} onPress={toggleMute}>
+              <Text style={styles.muteIcon}>{isMuted ? '🔇' : '🔊'}</Text>
+            </Pressable>
+          </Pressable>
+        ) : (
+          <Image
+            source={{ uri: post.thumbnailUrl ?? post.mediaUrl }}
+            style={styles.media}
+            resizeMode="cover"
+          />
+        )}
 
         {/* Glass overlay bar (Stitch: bottom-4, blur, emoji reactions + viewer count) */}
         <View style={styles.glassOverlay}>
@@ -130,6 +175,30 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: colors.surfaceContainerHighest,
+  },
+  playOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playIcon: {
+    fontSize: 48,
+    opacity: 0.8,
+  },
+  muteBtn: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  muteIcon: {
+    fontSize: 16,
   },
   glassOverlay: {
     position: 'absolute',

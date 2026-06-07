@@ -54,6 +54,7 @@ export function useCamera() {
     try {
       const video = await cameraRef.current.recordAsync({
         maxDuration: MAX_VIDEO_DURATION_SECONDS,
+        codec: 'avc1', // Ensure H.264 codec for compatibility
       });
       if (video) {
         const durationSeconds =

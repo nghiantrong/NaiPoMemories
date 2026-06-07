@@ -7,6 +7,7 @@ import { typography } from '@/theme/typography';
 import { CameraView as ExpoCameraView } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { useState } from 'react';
 import {
   Alert,
@@ -29,7 +30,14 @@ export function CameraView() {
   const { createPost, isLoading: isPosting, uploadProgress } = useCreatePost();
   const [caption, setCaption] = useState('');
   const [flash, setFlash] = useState(false);
-  const [activeMode, setActiveMode] = useState<'photo' | 'video'>('photo');
+
+  const player = useVideoPlayer(
+    camera.capturedMedia?.type === 'video' ? camera.capturedMedia.uri : null,
+    (player) => {
+      player.loop = true;
+      player.play();
+    }
+  );
 
   // ─── Permissions screen ──────────────────────────────────────────────────
   if (!camera.hasPermissions) {
@@ -66,11 +74,19 @@ export function CameraView() {
 
     return (
       <View style={styles.previewContainer}>
-        <Image
-          source={{ uri: camera.capturedMedia.uri }}
-          style={styles.preview}
-          resizeMode="cover"
-        />
+        {camera.capturedMedia.type === 'video' ? (
+          <VideoView
+            player={player}
+            style={styles.preview}
+            contentFit="cover"
+          />
+        ) : (
+          <Image
+            source={{ uri: camera.capturedMedia.uri }}
+            style={styles.preview}
+            resizeMode="cover"
+          />
+        )}
         <View style={[styles.previewOverlay, { paddingBottom: insets.bottom + spacing.lg }]}>
           <TextInput
             style={styles.captionInput}
@@ -113,8 +129,7 @@ export function CameraView() {
         ref={camera.cameraRef}
         style={StyleSheet.absoluteFill}
         facing={camera.facing}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        mode={activeMode as any}
+        mode={camera.mode === 'photo' ? 'picture' : 'video'}
       />
 
       {/* Grid overlay (Stitch: 2 vertical + 2 horizontal at 33% opacity 10%) */}
@@ -166,29 +181,27 @@ export function CameraView() {
           { paddingBottom: insets.bottom + spacing.lg },
         ]}
       >
-        {/* Mode Toggle (Stitch: VIDEO | ẢNH* | CẬP NHẬT) */}
+        {/* Mode Toggle (Stitch: VIDEO | ẢNH | CẬP NHẬT) */}
         <View style={styles.modeToggle}>
           <Pressable
             onPress={() => {
-              setActiveMode('video');
-              camera.toggleMode();
+              if (camera.mode !== 'video') camera.toggleMode();
             }}
             style={styles.modeBtn}
           >
             <Text
               style={[
                 styles.modeBtnText,
-                activeMode === 'video' && styles.modeBtnActive,
+                camera.mode === 'video' && styles.modeBtnActive,
               ]}
             >
               VIDEO
             </Text>
-            {activeMode === 'video' && <View style={styles.modeDot} />}
+            {camera.mode === 'video' && <View style={styles.modeDot} />}
           </Pressable>
 
           <Pressable
             onPress={() => {
-              setActiveMode('photo');
               if (camera.mode !== 'photo') camera.toggleMode();
             }}
             style={styles.modeBtn}
@@ -196,12 +209,12 @@ export function CameraView() {
             <Text
               style={[
                 styles.modeBtnText,
-                activeMode === 'photo' && styles.modeBtnActive,
+                camera.mode === 'photo' && styles.modeBtnActive,
               ]}
             >
               ẢNH
             </Text>
-            {activeMode === 'photo' && <View style={styles.modeDot} />}
+            {camera.mode === 'photo' && <View style={styles.modeDot} />}
           </Pressable>
 
           <Pressable style={styles.modeBtn}>
@@ -222,16 +235,30 @@ export function CameraView() {
               outer: w-24 h-24 border-[3px] border-white/90 shutter-glow
               inner: w-20 h-20 bg-primary-container + transparent inner div */}
           <Pressable
-            onPress={
-              camera.mode === 'photo' ? camera.takePicture : camera.startRecording
-            }
-            onLongPress={camera.startRecording}
+            onPress={() => {
+              if (camera.mode === 'photo') {
+                camera.takePicture();
+              } else {
+                if (camera.isRecording) {
+                  camera.stopRecording();
+                } else {
+                  camera.startRecording();
+                }
+              }
+            }}
+            onLongPress={camera.mode === 'photo' ? camera.startRecording : undefined}
             style={({ pressed }) => [
               styles.shutterOuter,
               pressed && { transform: [{ scale: 0.92 }] },
             ]}
           >
-            <View style={styles.shutterInner}>
+            <View
+              style={[
+                styles.shutterInner,
+                camera.mode === 'video' && { backgroundColor: colors.error }, // Red for video
+                camera.isRecording && { borderRadius: 12, transform: [{ scale: 0.5 }] }, // Square stop button when recording
+              ]}
+            >
               <View style={styles.shutterCore} />
             </View>
           </Pressable>
