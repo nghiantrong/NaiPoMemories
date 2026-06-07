@@ -27,6 +27,24 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing.screenPaddingHorizontal,
   },
+  bannerContainer: {
+    paddingHorizontal: spacing.screenPaddingHorizontal,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  bannerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff3cd', // Light yellow warning color
+    padding: spacing.md,
+    borderRadius: 12,
+  },
+  bannerText: {
+    flex: 1,
+    color: '#856404',
+    fontSize: 14,
+  },
   appBarTitle: {
     // Stitch: font-headline-lg-mobile (Quicksand 28px 700) text-primary
     ...typography.headlineLg,

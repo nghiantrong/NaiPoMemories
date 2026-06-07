@@ -10,6 +10,7 @@
  */
 
 import { authRepository } from '../repositories/auth.repository';
+import { userRepository } from '@/features/profile/repositories/user.repository';
 import { LoginFormData, RegisterFormData } from '../types/auth.types';
 import { parseFirebaseError, ValidationError } from '@/utils/error.utils';
 import { isValidEmail } from '@/utils/validation.utils';
@@ -58,6 +59,11 @@ export const authService = {
 
   async logout() {
     try {
+      const user = authRepository.getCurrentUser();
+      if (user) {
+        // Clear push token so another logged in user on this device doesn't receive pushes meant for this account
+        await userRepository.update(user.uid, { expoPushToken: null });
+      }
       await authRepository.logout();
     } catch (error) {
       throw parseFirebaseError(error);

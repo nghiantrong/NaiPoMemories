@@ -13,7 +13,11 @@ import React from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFeed } from '../hooks/useFeed';
+import { useFriends } from '@/features/friends/hooks/useFriends';
+import { useRecoverStreak } from '@/features/friends/hooks/useRecoverStreak';
+import { FriendWithProfile } from '@/features/friends/types/friend.types';
 import { PostCard } from './PostCard';
+import { Button } from '@/components/ui/Button';
 import { styles, APP_BAR_HEIGHT } from './FeedList.styles';
 
 interface FeedListProps {
@@ -46,9 +50,35 @@ function FeedAppBar({ userId }: { userId: string }) {
   );
 }
 
+function StreakRecoveryBanner({ userId, friends }: { userId: string, friends: FriendWithProfile[] }) {
+  const { recoverStreak, isRecovering } = useRecoverStreak(userId);
+  const atRiskFriends = friends?.filter(f => f.streakStatus === 'at_risk' && f.myRecoveryChances > 0) || [];
+
+  if (atRiskFriends.length === 0) return null;
+
+  return (
+    <View style={styles.bannerContainer}>
+      {atRiskFriends.map(f => (
+        <View key={f.friendshipId} style={styles.bannerRow}>
+          <Text style={styles.bannerText}>
+            🔥 Chuỗi với <Text style={{ fontWeight: 'bold' }}>{f.displayName}</Text> đang nguy hiểm!
+          </Text>
+          <Button 
+            label={`Phục hồi (${f.myRecoveryChances})`} 
+            onPress={() => recoverStreak(f.friendshipId)}
+            isLoading={isRecovering}
+            size="sm"
+          />
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export function FeedList({ userId }: FeedListProps) {
   const insets = useSafeAreaInsets();
   const { data: posts, isLoading, error, refetch, isRefetching } = useFeed(userId);
+  const { data: friends } = useFriends(userId);
 
   if (isLoading) return <Loader fullScreen />;
 
@@ -69,7 +99,12 @@ export function FeedList({ userId }: FeedListProps) {
       <FlatList
         data={posts}
         keyExtractor={(p) => p.id}
-        renderItem={({ item }) => <PostCard post={item} />}
+        ListHeaderComponent={<StreakRecoveryBanner userId={userId} friends={friends || []} />}
+        renderItem={({ item }) => {
+          const friendProfile = friends?.find(f => f.userId === item.userId);
+          const authorStreak = friendProfile?.streakCount || 0;
+          return <PostCard post={item} authorStreak={authorStreak} />;
+        }}
         contentContainerStyle={[
           styles.listContent,
           { paddingTop: appBarHeight + spacing.sm, paddingBottom: 120 + insets.bottom },

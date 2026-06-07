@@ -6,9 +6,11 @@ export interface UserDocument {
   displayName: string;
   avatarUrl?: string | null;
   createdAt: Timestamp;
+  expoPushToken?: string;
 }
 
 export interface UpdateProfilePayload {
   displayName?: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
+  expoPushToken?: string | null;
 }

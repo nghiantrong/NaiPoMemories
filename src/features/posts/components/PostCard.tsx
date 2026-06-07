@@ -14,9 +14,10 @@ import { styles, CARD_IMAGE_SIZE } from './PostCard.styles';
 
 interface PostCardProps {
   post: Post;
+  authorStreak?: number;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, authorStreak = 0 }: PostCardProps) {
   const { data: author } = useProfile(post.userId);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -51,7 +52,10 @@ export function PostCard({ post }: PostCardProps) {
       <View style={styles.header}>
         <Avatar uri={author?.avatarUrl} displayName={author?.displayName} size="sm" />
         <View style={styles.authorInfo}>
-          <Text style={styles.authorName}>{author?.displayName ?? '...'}</Text>
+          <Text style={styles.authorName}>
+            {author?.displayName ?? '...'}
+            {authorStreak > 0 ? ` 🔥 ${authorStreak}` : ''}
+          </Text>
           <Text style={styles.timestamp}>{timeAgo(post.createdAt)}</Text>
         </View>
         <Pressable style={styles.moreBtn}>

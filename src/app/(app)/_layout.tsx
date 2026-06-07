@@ -2,6 +2,7 @@ import { Tabs, Redirect } from 'expo-router';
 import { StyleSheet, View, Text, Pressable, Animated } from 'react-native';
 import { useRef, useEffect } from 'react';
 import { useAuthStore } from '@/store/auth.store';
+import { useNotifications } from '@/features/notifications/hooks/useNotifications';
 import { routes } from '@/constants/routes';
 import { colors } from '@/theme/colors';
 import { BlurView } from 'expo-blur';
@@ -221,6 +222,9 @@ const tabStyles = StyleSheet.create({
 // ─── App Layout ───────────────────────────────────────────────────────────────
 export default function AppLayout() {
   const { isAuthenticated } = useAuthStore();
+  
+  // Call useNotifications here so it requests permission on app launch instead of camera mount
+  useNotifications();
 
   if (!isAuthenticated) {
     return <Redirect href={routes.auth.login} />;

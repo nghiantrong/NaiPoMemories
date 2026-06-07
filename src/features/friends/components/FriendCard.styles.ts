@@ -23,6 +23,10 @@ export const styles = StyleSheet.create({
     ...typography.labelLg,
     color: colors.onSurface,
   },
+  streakText: {
+    color: '#ff6b6b', // fiery red
+    fontSize: 14,
+  },
   email: {
     ...typography.labelSm,
     color: colors.onSurfaceVariant,

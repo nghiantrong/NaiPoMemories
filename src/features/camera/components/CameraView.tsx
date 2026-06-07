@@ -82,6 +82,7 @@ export function CameraView() {
       try {
         await createPost({
           userId: user.uid,
+          userName: user.displayName || 'Bạn của bạn',
           localUri: camera.capturedMedia!.uri,
           mediaType: camera.capturedMedia!.type === 'photo' ? 'image' : 'video',
           duration: camera.capturedMedia!.duration,

@@ -105,8 +105,20 @@ export const friendRepository = {
       user1Id,
       user2Id,
       createdAt: serverTimestamp(),
+      streakCount: 0,
+      lastUser1PostDate: null,
+      lastUser2PostDate: null,
+      streakLastUpdatedDate: null,
+      streakStatus: 'active',
+      recoveryChancesUser1: 2,
+      recoveryChancesUser2: 2,
+      lastRecoveryMonth: new Date().toISOString().slice(0, 7),
     });
     return ref.id;
+  },
+
+  async updateFriendship(friendshipId: string, data: Partial<Friendship>): Promise<void> {
+    await updateDoc(doc(firestore, FRIENDSHIPS_COL, friendshipId), data);
   },
 
   async getFriendships(userId: string): Promise<Friendship[]> {

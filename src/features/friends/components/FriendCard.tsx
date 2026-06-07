@@ -18,7 +18,10 @@ export function FriendCard({ friend, onPress }: FriendCardProps) {
     <Pressable style={styles.card} onPress={onPress}>
       <Avatar uri={friend.avatarUrl} displayName={friend.displayName} size="md" />
       <View style={styles.info}>
-        <Text style={styles.name}>{friend.displayName}</Text>
+        <Text style={styles.name}>
+          {friend.displayName}
+          {friend.streakCount > 0 && <Text style={styles.streakText}> 🔥 {friend.streakCount}</Text>}
+        </Text>
         <Text style={styles.email} numberOfLines={1}>{friend.email}</Text>
       </View>
       <View style={styles.badge}>
