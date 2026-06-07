@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,20 +18,21 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { spacing } from '@/theme/spacing';
+import { spacing, borderRadius } from '@/theme/spacing';
+import { shadows } from '@/theme/shadows';
 
 const registerSchema = z
   .object({
     displayName: z
       .string()
-      .min(2, 'Display name must be at least 2 characters.')
-      .max(50, 'Display name must be 50 characters or fewer.'),
-    email: z.string().email('Please enter a valid email address.'),
-    password: z.string().min(6, 'Password must be at least 6 characters.'),
+      .min(2, 'Tên hiển thị phải có ít nhất 2 ký tự.')
+      .max(50, 'Tên hiển thị không được quá 50 ký tự.'),
+    email: z.string().email('Vui lòng nhập email hợp lệ.'),
+    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự.'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
+    message: 'Mật khẩu xác nhận không khớp.',
     path: ['confirmPassword'],
   });
 
@@ -49,121 +60,252 @@ export function RegisterForm({ onNavigateToLogin }: RegisterFormProps) {
     await register(data).catch(() => {});
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create account ✨</Text>
-      <Text style={styles.subtitle}>Join NaiPoMemories</Text>
-
-      <View style={styles.fields}>
-        <Controller
-          control={control}
-          name="displayName"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Display Name"
-              placeholder="Your name"
-              autoCapitalize="words"
-              autoComplete="name"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.displayName?.message}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Email"
-              placeholder="you@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.email?.message}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Password"
-              placeholder="Min. 6 characters"
-              secureTextEntry={!showPassword}
-              autoComplete="new-password"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.password?.message}
-              rightIcon={
-                <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
-              }
-              onRightIconPress={() => setShowPassword((prev) => !prev)}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="confirmPassword"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Confirm Password"
-              placeholder="Repeat your password"
-              secureTextEntry={!showPassword}
-              autoComplete="new-password"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.confirmPassword?.message}
-            />
-          )}
-        />
+    <KeyboardAvoidingView
+      style={styles.keyboardAvoid}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={insets.top}
+    >
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+    >
+      {/* ── Top section ── */}
+      <View style={styles.topSection}>
+        <View style={styles.logoBox}>
+          <Text style={styles.logoEmoji}>✨</Text>
+        </View>
+        <Text style={styles.appName}>NaiPoMemories</Text>
+        <Text style={styles.tagline}>Ghi lại từng khoảnh khắc đáng nhớ</Text>
       </View>
 
-      {error && <Text style={styles.serverError}>{error}</Text>}
+      {/* ── Glass Panel ── */}
+      <View style={styles.glassWrapper}>
+        <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
+        <View style={styles.glassContent}>
+          <View style={styles.headingGroup}>
+            <Text style={styles.heading}>Tạo tài khoản ✨</Text>
+            <Text style={styles.subheading}>
+              Tham gia cùng bạn bè trên NaiPoMemories
+            </Text>
+          </View>
 
-      <Button
-        label="Create Account"
-        onPress={handleSubmit(onSubmit)}
-        isLoading={isLoading}
-        fullWidth
-      />
+          <View style={styles.fields}>
+            <Controller
+              control={control}
+              name="displayName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  label="Tên hiển thị"
+                  placeholder="Tên của bạn"
+                  autoCapitalize="words"
+                  autoComplete="name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.displayName?.message}
+                />
+              )}
+            />
 
-      <Pressable onPress={onNavigateToLogin} style={styles.linkRow}>
-        <Text style={styles.linkText}>
-          Already have an account?{' '}
-          <Text style={styles.link}>Sign in</Text>
-        </Text>
-      </Pressable>
-    </View>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  label="Email"
+                  placeholder="you@example.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.email?.message}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  label="Mật khẩu"
+                  placeholder="Tối thiểu 6 ký tự"
+                  secureTextEntry={!showPassword}
+                  autoComplete="new-password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.password?.message}
+                  rightIcon={
+                    <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+                  }
+                  onRightIconPress={() => setShowPassword((p) => !p)}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  label="Xác nhận mật khẩu"
+                  placeholder="Nhập lại mật khẩu"
+                  secureTextEntry={!showPassword}
+                  autoComplete="new-password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.confirmPassword?.message}
+                />
+              )}
+            />
+          </View>
+
+          {error && <Text style={styles.serverError}>{error}</Text>}
+
+          <Button
+            label="Tạo tài khoản"
+            onPress={handleSubmit(onSubmit)}
+            isLoading={isLoading}
+            fullWidth
+            size="lg"
+          />
+
+          <Pressable onPress={onNavigateToLogin} style={styles.loginRow}>
+            <Text style={styles.loginText}>
+              Đã có tài khoản?{' '}
+              <Text style={styles.loginLink}>Đăng nhập</Text>
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Decorative blobs */}
+      <View style={styles.blobBottomLeft} />
+      <View style={styles.blobTopRight} />
+    </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { gap: spacing.lg },
-  title: { ...typography.headlineLg, color: colors.onSurface },
-  subtitle: {
+  keyboardAvoid: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: spacing.xl,
+  },
+
+  // Top branding
+  topSection: {
+    alignItems: 'center',
+    paddingTop: spacing.xxl,
+    paddingBottom: spacing.lg,
+    gap: spacing.sm,
+  },
+  logoBox: {
+    width: 64,
+    height: 64,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.md,
+  },
+  logoEmoji: {
+    fontSize: 32,
+  },
+  appName: {
+    ...typography.headlineMd,
+    color: colors.primary,
+  },
+  tagline: {
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
-    marginTop: -spacing.md,
+    textAlign: 'center',
   },
-  fields: { gap: spacing.md },
+
+  // Glass panel
+  glassWrapper: {
+    marginHorizontal: spacing.screenPaddingHorizontal,
+    borderRadius: borderRadius.xxl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
+    ...shadows.lg,
+  },
+  glassContent: {
+    padding: spacing.xl,
+    gap: spacing.lg,
+  },
+  headingGroup: {
+    gap: spacing.xs,
+  },
+  heading: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+  },
+  subheading: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+  },
+  fields: {
+    gap: spacing.md,
+  },
   serverError: {
     ...typography.bodyMd,
     color: colors.error,
     textAlign: 'center',
   },
   eyeIcon: { fontSize: 16 },
-  linkRow: { alignItems: 'center', paddingVertical: spacing.sm },
-  linkText: { ...typography.bodyMd, color: colors.onSurfaceVariant },
-  link: { color: colors.primary, fontWeight: '700' },
+
+  loginRow: {
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+  },
+  loginText: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+  },
+  loginLink: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+
+  // Decorative blobs
+  blobBottomLeft: {
+    position: 'absolute',
+    bottom: -80,
+    left: -80,
+    width: 256,
+    height: 256,
+    borderRadius: 128,
+    backgroundColor: colors.primaryContainer,
+    opacity: 0.15,
+  },
+  blobTopRight: {
+    position: 'absolute',
+    top: -40,
+    right: -80,
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: colors.secondaryContainer,
+    opacity: 0.2,
+  },
 });

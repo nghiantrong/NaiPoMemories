@@ -3,8 +3,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Avatar } from '@/components/ui/Avatar';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { spacing } from '@/theme/spacing';
-import { borderRadius } from '@/theme/spacing';
+import { spacing, borderRadius } from '@/theme/spacing';
 import { shadows } from '@/theme/shadows';
 import { FriendWithProfile } from '../types/friend.types';
 
@@ -21,6 +20,9 @@ export function FriendCard({ friend, onPress }: FriendCardProps) {
         <Text style={styles.name}>{friend.displayName}</Text>
         <Text style={styles.email} numberOfLines={1}>{friend.email}</Text>
       </View>
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>Bạn bè</Text>
+      </View>
     </Pressable>
   );
 }
@@ -29,7 +31,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: colors.surfaceContainerLow,
     borderRadius: borderRadius.lg,
     padding: spacing.cardPadding,
     gap: spacing.md,
@@ -37,15 +39,25 @@ const styles = StyleSheet.create({
   },
   info: {
     flex: 1,
-    gap: spacing.xs,
+    gap: 2,
   },
   name: {
-    ...typography.bodyMd,
+    ...typography.labelLg,
     color: colors.onSurface,
-    fontWeight: '600',
   },
   email: {
-    ...typography.labelMd,
+    ...typography.labelSm,
     color: colors.onSurfaceVariant,
+  },
+  badge: {
+    backgroundColor: colors.primaryContainer,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.full,
+  },
+  badgeText: {
+    ...typography.labelSm,
+    color: colors.onPrimaryContainer,
+    fontWeight: '700',
   },
 });

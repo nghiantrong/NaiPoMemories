@@ -1,16 +1,22 @@
-import React from 'react';
-import { View, Pressable, StyleSheet, Text } from 'react-native';
+import React, { useRef } from 'react';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Text,
+  Animated,
+} from 'react-native';
 import { colors } from '@/theme/colors';
-import { spacing } from '@/theme/spacing';
-import { typography } from '@/theme/typography';
-import { CameraMode } from '../types/camera.types';
+import { shadows } from '@/theme/shadows';
+
+type CameraMode = 'photo' | 'video';
 
 interface CaptureButtonProps {
   mode: CameraMode;
   isRecording: boolean;
   onPress: () => void;
-  onLongPress?: () => void;
-  onPressOut?: () => void;
+  onLongPress: () => void;
+  onPressOut: () => void;
 }
 
 export function CaptureButton({
@@ -20,37 +26,51 @@ export function CaptureButton({
   onLongPress,
   onPressOut,
 }: CaptureButtonProps) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.9,
+      useNativeDriver: true,
+      damping: 15,
+      stiffness: 300,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      damping: 15,
+      stiffness: 300,
+    }).start();
+    onPressOut();
+  };
+
   return (
     <View style={styles.wrapper}>
-      {mode === 'video' && isRecording && (
-        <Text style={styles.recordingLabel}>● REC</Text>
+      {/* Pulsing glow ring — matches Stitch "shutter-glow" */}
+      {!isRecording && (
+        <View style={styles.glowRing} />
       )}
-      <Pressable
-        style={[
-          styles.outer,
-          mode === 'video' && styles.outerVideo,
-          isRecording && styles.outerRecording,
-        ]}
-        onPress={mode === 'photo' ? onPress : undefined}
-        onLongPress={mode === 'video' && !isRecording ? onLongPress : undefined}
-        onPressOut={mode === 'video' && isRecording ? onPressOut : undefined}
-        delayLongPress={200}
-      >
-        <View
-          style={[
-            styles.inner,
-            mode === 'video' && styles.innerVideo,
-            isRecording && styles.innerRecording,
-          ]}
-        />
-      </Pressable>
-      <Text style={styles.hint}>
-        {mode === 'photo'
-          ? 'Tap to capture'
-          : isRecording
-          ? 'Release to stop'
-          : 'Hold to record'}
-      </Text>
+
+      <Animated.View style={[styles.outerRing, { transform: [{ scale: scaleAnim }] }]}>
+        <Pressable
+          style={[styles.button, isRecording && styles.buttonRecording]}
+          onPress={onPress}
+          onLongPress={onLongPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+        >
+          {isRecording ? (
+            <View style={styles.stopIcon} />
+          ) : (
+            <Text style={styles.icon}>
+              {mode === 'photo' ? '📷' : '🎥'}
+            </Text>
+          )}
+        </Pressable>
+      </Animated.View>
     </View>
   );
 }
@@ -58,47 +78,48 @@ export function CaptureButton({
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
-    gap: spacing.sm,
+    justifyContent: 'center',
+    width: 100,
+    height: 100,
   },
-  recordingLabel: {
-    ...typography.labelLg,
-    color: colors.recordingRed,
-    letterSpacing: 1,
+  glowRing: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.primaryLight,
+    opacity: 0.2,
   },
-  outer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
-    borderColor: colors.white,
+  outerRing: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: colors.background,
+    borderWidth: 8,
+    borderColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.shutterGlow,
   },
-  outerVideo: {
-    borderColor: colors.recordingRed,
+  button: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: colors.primaryLight, // #a4c639 matcha green
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.shutterGlow,
   },
-  outerRecording: {
-    borderColor: colors.recordingRed,
-    borderWidth: 6,
+  buttonRecording: {
+    backgroundColor: colors.error,
   },
-  inner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.white,
+  icon: {
+    fontSize: 32,
   },
-  innerVideo: {
-    backgroundColor: colors.recordingRed,
-  },
-  innerRecording: {
-    width: 30,
-    height: 30,
-    borderRadius: 6,
-    backgroundColor: colors.recordingRed,
-  },
-  hint: {
-    ...typography.labelSm,
-    color: colors.white,
-    opacity: 0.8,
+  stopIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    backgroundColor: colors.onError,
   },
 });

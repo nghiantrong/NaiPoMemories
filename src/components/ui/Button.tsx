@@ -18,8 +18,6 @@ import { typography } from '@/theme/typography';
 import { borderRadius, spacing } from '@/theme/spacing';
 import { shadows } from '@/theme/shadows';
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
 type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
@@ -52,14 +50,21 @@ export function Button({
   }));
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.96, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(0.95, { damping: 15, stiffness: 350 });
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    scale.value = withSpring(1, { damping: 15, stiffness: 350 });
   };
 
   const isDisabled = disabled ?? isLoading;
+
+  const loaderColor =
+    variant === 'primary'
+      ? colors.onPrimaryContainer
+      : variant === 'danger'
+      ? colors.onError
+      : colors.primary;
 
   return (
     <Animated.View style={[animatedStyle, fullWidth && styles.fullWidth]}>
@@ -80,14 +85,17 @@ export function Button({
         {...rest}
       >
         {isLoading ? (
-          <ActivityIndicator
-            size="small"
-            color={variant === 'primary' ? colors.onPrimary : colors.primary}
-          />
+          <ActivityIndicator size="small" color={loaderColor} />
         ) : (
           <>
             {leftIcon}
-            <Text style={[textStyles.label, textStyles[`labelVariant_${variant}`], textStyles[`labelSize_${size}`]]}>
+            <Text
+              style={[
+                textStyles.label,
+                textStyles[`labelVariant_${variant}`],
+                textStyles[`labelSize_${size}`],
+              ]}
+            >
               {label}
             </Text>
           </>
@@ -104,7 +112,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: borderRadius.full,
     gap: spacing.sm,
-    ...shadows.md,
   } as ViewStyle,
   fullWidth: {
     width: '100%',
@@ -113,27 +120,49 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   } as ViewStyle,
 
-  // Variants
-  primary: { backgroundColor: colors.primary } as ViewStyle,
-  secondary: { backgroundColor: colors.secondaryContainer } as ViewStyle,
+  // Variants — primary uses primaryLight (#a4c639) per Stitch "primary-container" button
+  primary: {
+    backgroundColor: colors.primaryLight,
+    ...shadows.md,
+  } as ViewStyle,
+  secondary: {
+    backgroundColor: colors.secondaryContainer,
+  } as ViewStyle,
   outline: {
     backgroundColor: colors.transparent,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: colors.primary,
-    ...shadows.none,
   } as ViewStyle,
-  ghost: { backgroundColor: colors.transparent, ...shadows.none } as ViewStyle,
-  danger: { backgroundColor: colors.error } as ViewStyle,
+  ghost: {
+    backgroundColor: colors.transparent,
+  } as ViewStyle,
+  danger: {
+    backgroundColor: colors.error,
+    ...shadows.md,
+  } as ViewStyle,
 
   // Sizes
-  size_sm: { paddingVertical: spacing.xs, paddingHorizontal: spacing.md, minHeight: 36 } as ViewStyle,
-  size_md: { paddingVertical: spacing.buttonPaddingVertical, paddingHorizontal: spacing.buttonPaddingHorizontal, minHeight: 52 } as ViewStyle,
-  size_lg: { paddingVertical: spacing[4] + 2, paddingHorizontal: spacing.xl, minHeight: 58 } as ViewStyle,
+  size_sm: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    minHeight: 36,
+  } as ViewStyle,
+  size_md: {
+    paddingVertical: spacing.buttonPaddingVertical,
+    paddingHorizontal: spacing.buttonPaddingHorizontal,
+    minHeight: 52,
+  } as ViewStyle,
+  size_lg: {
+    paddingVertical: spacing[4] + 2,
+    paddingHorizontal: spacing.xl,
+    minHeight: 58,
+  } as ViewStyle,
 });
 
 const textStyles = StyleSheet.create({
   label: { ...typography.button } as TextStyle,
-  labelVariant_primary: { color: colors.onPrimary } as TextStyle,
+  // primary text = onPrimaryContainer (dark green #3e5000) per Stitch
+  labelVariant_primary: { color: colors.onPrimaryContainer } as TextStyle,
   labelVariant_secondary: { color: colors.primary } as TextStyle,
   labelVariant_outline: { color: colors.primary } as TextStyle,
   labelVariant_ghost: { color: colors.primary } as TextStyle,
@@ -142,4 +171,3 @@ const textStyles = StyleSheet.create({
   labelSize_md: { fontSize: 16 } as TextStyle,
   labelSize_lg: { fontSize: 18 } as TextStyle,
 });
-

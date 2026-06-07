@@ -1,33 +1,64 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  RefreshControl,
-} from 'react-native';
-import { useAuthStore } from '@/store/auth.store';
-import { useFriends } from '../hooks/useFriends';
-import { useFriendRequests } from '../hooks/useFriendRequests';
-import { useSearchUser } from '../hooks/useSearchUser';
-import { useProfile } from '@/features/profile/hooks/useProfile';
-import { FriendCard } from './FriendCard';
-import { FriendRequestItem } from './FriendRequestItem';
-import { Input } from '@/components/ui/Input';
+import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Input } from '@/components/ui/Input';
 import { Loader } from '@/components/ui/Loader';
+import { useProfile } from '@/features/profile/hooks/useProfile';
+import { useAuthStore } from '@/store/auth.store';
 import { colors } from '@/theme/colors';
+import { borderRadius, spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-import { spacing } from '@/theme/spacing';
+import { BlurView } from 'expo-blur';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFriendRequests } from '../hooks/useFriendRequests';
+import { useFriends } from '../hooks/useFriends';
+import { useSearchUser } from '../hooks/useSearchUser';
 import { FriendRequest } from '../types/friend.types';
+import { FriendCard } from './FriendCard';
+import { FriendRequestItem } from './FriendRequestItem';
+
+const APP_BAR_HEIGHT = 68;
+
+function FriendsAppBar({ userId }: { userId: string }) {
+  const insets = useSafeAreaInsets();
+  const { data: profile } = useProfile(userId);
+  const router = useRouter();
+
+  return (
+    <View style={[styles.appBarWrapper, { paddingTop: insets.top }]}>
+      <BlurView intensity={60} tint="light" style={StyleSheet.absoluteFill} />
+      <View style={styles.appBar}>
+        <View style={styles.appBarLeft}>
+          <Pressable onPress={() => router.navigate('/profile')}>
+            <Avatar uri={profile?.avatarUrl} displayName={profile?.displayName} size="sm" />
+          </Pressable>
+          <Text style={styles.appBarTitle}>Tìm bạn bè</Text>
+        </View>
+        <Pressable style={styles.appBarAction}>
+          <Text style={styles.appBarActionText}>👥+</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
 
 export function FriendsScreen() {
   const { user } = useAuthStore();
+  const insets = useSafeAreaInsets();
   const [searchEmail, setSearchEmail] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -49,43 +80,43 @@ export function FriendsScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([
-      refetchFriends(),
-      refetchRequests(),
-    ]);
+    await Promise.all([refetchFriends(), refetchRequests()]);
     setRefreshing(false);
   };
 
+  const appBarHeight = APP_BAR_HEIGHT + insets.top;
+
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      {/* Search / Add Friend */}
+      {/* ── Search Section ── */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Add Friend</Text>
+        <Text style={styles.sectionLabel}>Thêm bạn mới</Text>
         <View style={styles.searchRow}>
           <Input
-            placeholder="Search by email"
+            placeholder="Tìm theo email..."
             keyboardType="email-address"
             autoCapitalize="none"
             value={searchEmail}
             onChangeText={(t) => { setSearchEmail(t); reset(); }}
             containerStyle={styles.searchInput}
+            leftIcon={<Text style={styles.searchIcon}>🔍</Text>}
           />
           <Button
-            label="Add"
+            label="Gửi"
             size="sm"
             onPress={handleSend}
             isLoading={isSending}
           />
         </View>
         {error && <Text style={styles.errorText}>{error}</Text>}
-        {successMessage && <Text style={styles.successText}>{successMessage}</Text>}
+        {successMessage && <Text style={styles.successText}>✅ {successMessage}</Text>}
       </View>
 
-      {/* Incoming Requests */}
+      {/* ── Incoming Requests ── */}
       {requests.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            Requests ({requests.length})
+            Lời mời kết bạn ({requests.length})
           </Text>
           {requests.map((req) => (
             <RequestRow
@@ -98,28 +129,42 @@ export function FriendsScreen() {
         </View>
       )}
 
+      {/* ── Friends section heading ── */}
       <Text style={styles.sectionTitle}>
-        Friends ({friends?.length ?? 0})
+        Bạn bè ({friends?.length ?? 0})
       </Text>
     </View>
   );
 
+  const renderFooter = () => (
+    /* ── Invite Section (Stitch "Mời bạn bè" block) ── */
+    <View style={styles.inviteCard}>
+      <View style={styles.inviteIcon}>
+        <Text style={styles.inviteIconEmoji}>🎉</Text>
+      </View>
+      <Text style={styles.inviteTitle}>Mời bạn bè</Text>
+      <Text style={styles.inviteSubtitle}>
+        Chia sẻ khoảnh khắc đẹp cùng những người thân yêu nhất.
+      </Text>
+      <Button label="📤  Gửi lời mời ngay" fullWidth />
+    </View>
+  );
+
   const renderEmpty = () => {
-    if (loadingFriends && !refreshing) {
-      return <Loader />;
-    }
+    if (loadingFriends && !refreshing) return <Loader />;
     return (
       <EmptyState
         emoji="👋"
-        title="No friends yet"
-        message="Search by email to add your first friend!"
+        title="Chưa có bạn bè"
+        message="Tìm theo email để thêm người bạn đầu tiên!"
       />
     );
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <FriendsAppBar userId={user?.uid ?? ''} />
         <KeyboardAvoidingView
           style={styles.container}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -130,7 +175,11 @@ export function FriendsScreen() {
             renderItem={({ item }) => <FriendCard friend={item} />}
             ListHeaderComponent={renderHeader}
             ListEmptyComponent={renderEmpty}
-            contentContainerStyle={styles.list}
+            ListFooterComponent={renderFooter}
+            contentContainerStyle={[
+              styles.list,
+              { paddingTop: appBarHeight + spacing.sm, paddingBottom: 120 + insets.bottom },
+            ]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             refreshControl={
@@ -139,6 +188,7 @@ export function FriendsScreen() {
                 onRefresh={handleRefresh}
                 colors={[colors.primary]}
                 tintColor={colors.primary}
+                progressViewOffset={appBarHeight}
               />
             }
           />
@@ -148,7 +198,7 @@ export function FriendsScreen() {
   );
 }
 
-// Tiny helper component to load sender profile for each request
+// Helper component for request rows
 function RequestRow({
   request,
   onAccept,
@@ -172,22 +222,67 @@ function RequestRow({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+
+  // App bar
+  appBarWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 50,
+    overflow: 'hidden',
+  },
+  appBar: {
+    height: APP_BAR_HEIGHT,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.screenPaddingHorizontal,
   },
+  appBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  appBarTitle: {
+    ...typography.headlineLg,
+    color: colors.primary,
+    letterSpacing: -0.5,
+  },
+  appBarAction: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  appBarActionText: {
+    fontSize: 22,
+  },
+
+  // List
+  list: {
+    paddingHorizontal: spacing.screenPaddingHorizontal,
+    gap: spacing.sm,
+  },
   headerContainer: {
-    gap: spacing.sm,
+    gap: spacing.md,
+    marginBottom: spacing.md,
   },
+
+  // Sections
   section: {
-    paddingVertical: spacing.md,
     gap: spacing.sm,
   },
-  friendsSection: {
-    flex: 1,
+  sectionLabel: {
+    ...typography.labelLg,
+    color: colors.secondary,
+    marginLeft: 4,
   },
   sectionTitle: {
     ...typography.headlineSm,
     color: colors.onSurface,
-    marginBottom: spacing.xs,
   },
   searchRow: {
     flexDirection: 'row',
@@ -197,16 +292,48 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
   },
+  searchIcon: {
+    fontSize: 18,
+  },
   errorText: {
     ...typography.labelMd,
     color: colors.error,
+    marginLeft: 4,
   },
   successText: {
     ...typography.labelMd,
     color: colors.primary,
+    marginLeft: 4,
   },
-  list: {
-    gap: spacing.sm,
-    paddingBottom: spacing.lg,
+
+  // Invite card
+  inviteCard: {
+    marginTop: spacing.xl,
+    backgroundColor: colors.secondaryContainer,
+    borderRadius: borderRadius.xxl,
+    padding: spacing.xl,
+    alignItems: 'center',
+    gap: spacing.md,
+    opacity: 0.85,
+  },
+  inviteIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.primaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inviteIconEmoji: {
+    fontSize: 30,
+  },
+  inviteTitle: {
+    ...typography.headlineMd,
+    color: colors.onSurface,
+  },
+  inviteSubtitle: {
+    ...typography.bodyMd,
+    color: colors.onSurfaceVariant,
+    textAlign: 'center',
   },
 });

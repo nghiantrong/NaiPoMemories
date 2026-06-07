@@ -1,17 +1,24 @@
 import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { routes } from '@/constants/routes';
+import { colors } from '@/theme/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
 
   return (
-    <ScreenContainer scrollable padded>
-      <LoginForm
-        onNavigateToRegister={() => router.push(routes.auth.register)}
-      />
-    </ScreenContainer>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <LoginForm onNavigateToRegister={() => router.push(routes.auth.register)} />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+});

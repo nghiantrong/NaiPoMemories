@@ -1,13 +1,19 @@
 import React from 'react';
-import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { Header } from '@/components/layout/Header';
+import { View, StyleSheet } from 'react-native';
 import { FriendsScreen as FriendsContent } from '@/features/friends/components/FriendsScreen';
+import { colors } from '@/theme/colors';
 
 export default function FriendsScreen() {
   return (
-    <ScreenContainer padded={false} edges={['top']}>
-      <Header title="Friends" />
+    <View style={styles.container}>
       <FriendsContent />
-    </ScreenContainer>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+});

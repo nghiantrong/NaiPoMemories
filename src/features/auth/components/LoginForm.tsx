@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Image,
+  ScrollView,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,11 +21,15 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { spacing } from '@/theme/spacing';
+import { spacing, borderRadius } from '@/theme/spacing';
+import { shadows } from '@/theme/shadows';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.35;
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address.'),
-  password: z.string().min(6, 'Password must be at least 6 characters.'),
+  email: z.string().email('Vui lòng nhập email hợp lệ.'),
+  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự.'),
 });
 
 type LoginSchema = z.infer<typeof loginSchema>;
@@ -36,88 +53,200 @@ export function LoginForm({ onNavigateToRegister }: LoginFormProps) {
 
   const onSubmit = async (data: LoginSchema) => {
     reset();
-    await login(data).catch(() => {
-      // Error is handled in the hook and surfaced via `error`
-    });
+    await login(data).catch(() => {});
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back 👋</Text>
-      <Text style={styles.subtitle}>Sign in to NaiPoMemories</Text>
-
-      <View style={styles.fields}>
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Email"
-              placeholder="you@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.email?.message}
-            />
-          )}
+    <KeyboardAvoidingView
+      style={styles.keyboardAvoid}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={insets.top}
+    >
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+    >
+      {/* ── Hero Header ── */}
+      <View style={[styles.heroContainer, { height: HERO_HEIGHT }]}>
+        <Image
+          source={{ uri: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=80' }}
+          style={styles.heroImage}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={['transparent', colors.background]}
+          style={StyleSheet.absoluteFill}
         />
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Password"
-              placeholder="••••••"
-              secureTextEntry={!showPassword}
-              autoComplete="password"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.password?.message}
-              rightIcon={
-                <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
-              }
-              onRightIconPress={() => setShowPassword((prev) => !prev)}
-            />
-          )}
-        />
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logoBox}>
+            <Text style={styles.logoEmoji}>🍃</Text>
+          </View>
+          <Text style={styles.appName}>NaiPoMemories</Text>
+        </View>
       </View>
 
-      {error && <Text style={styles.serverError}>{error}</Text>}
+      {/* ── Glass Panel ── */}
+      <View style={styles.glassWrapper}>
+        <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
+        <View style={styles.glassContent}>
+          <View style={styles.headingGroup}>
+            <Text style={styles.heading}>Chào mừng bạn! 👋</Text>
+            <Text style={styles.subheading}>
+              Hãy cùng chia sẻ những khoảnh khắc chân thực nhất.
+            </Text>
+          </View>
 
-      <Button
-        label="Sign In"
-        onPress={handleSubmit(onSubmit)}
-        isLoading={isLoading}
-        fullWidth
-      />
+          {/* Form */}
+          <View style={styles.fields}>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  label="Email"
+                  placeholder="you@example.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.email?.message}
+                />
+              )}
+            />
 
-      <Pressable onPress={onNavigateToRegister} style={styles.linkRow}>
-        <Text style={styles.linkText}>
-          Don't have an account?{' '}
-          <Text style={styles.link}>Sign up</Text>
-        </Text>
-      </Pressable>
-    </View>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  label="Mật khẩu"
+                  placeholder="Tối thiểu 6 ký tự"
+                  secureTextEntry={!showPassword}
+                  autoComplete="password"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={errors.password?.message}
+                  rightIcon={
+                    <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁️'}</Text>
+                  }
+                  onRightIconPress={() => setShowPassword((p) => !p)}
+                />
+              )}
+            />
+          </View>
+
+          {error && <Text style={styles.serverError}>{error}</Text>}
+
+          <Button
+            label="Đăng nhập"
+            onPress={handleSubmit(onSubmit)}
+            isLoading={isLoading}
+            fullWidth
+            size="lg"
+          />
+
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Chưa có tài khoản?</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <Pressable onPress={onNavigateToRegister} style={styles.signupBtn}>
+            <Text style={styles.signupText}>Tạo tài khoản mới</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Decorative blobs */}
+      <View style={styles.blobBottomLeft} />
+      <View style={styles.blobTopRight} />
+    </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  keyboardAvoid: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+
+  // Hero
+  heroContainer: {
+    width: '100%',
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: spacing.xl,
+  },
+  heroImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  logoBox: {
+    width: 72,
+    height: 72,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '3deg' }],
+    ...shadows.shutterGlow,
+  },
+  logoEmoji: {
+    fontSize: 36,
+  },
+  appName: {
+    ...typography.headlineLg,
+    color: colors.primary,
+    letterSpacing: -0.5,
+  },
+
+  // Glass panel
+  glassWrapper: {
+    marginHorizontal: spacing.screenPaddingHorizontal,
+    marginTop: -spacing.xl,
+    borderRadius: borderRadius.xxl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
+    ...shadows.lg,
+  },
+  glassContent: {
+    padding: spacing.xl,
     gap: spacing.lg,
   },
-  title: {
-    ...typography.headlineLg,
+  headingGroup: {
+    gap: spacing.xs,
+  },
+  heading: {
+    ...typography.headlineMd,
     color: colors.onSurface,
   },
-  subtitle: {
+  subheading: {
     ...typography.bodyMd,
     color: colors.onSurfaceVariant,
-    marginTop: -spacing.md,
   },
   fields: {
     gap: spacing.md,
@@ -130,16 +259,55 @@ const styles = StyleSheet.create({
   eyeIcon: {
     fontSize: 16,
   },
-  linkRow: {
+
+  // Divider
+  divider: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.sm,
+    gap: spacing.md,
   },
-  linkText: {
-    ...typography.bodyMd,
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.outlineVariant,
+  },
+  dividerText: {
+    ...typography.labelMd,
     color: colors.onSurfaceVariant,
   },
-  link: {
+
+  // Sign up link as button
+  signupBtn: {
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.full,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  signupText: {
+    ...typography.button,
     color: colors.primary,
-    fontWeight: '700',
+  },
+
+  // Decorative blobs
+  blobBottomLeft: {
+    position: 'absolute',
+    bottom: -80,
+    left: -80,
+    width: 256,
+    height: 256,
+    borderRadius: 128,
+    backgroundColor: colors.primaryContainer,
+    opacity: 0.15,
+  },
+  blobTopRight: {
+    position: 'absolute',
+    top: -80,
+    right: -80,
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: colors.secondaryContainer,
+    opacity: 0.25,
   },
 });

@@ -11,13 +11,14 @@ interface AvatarProps {
   displayName?: string;
   size?: AvatarSize;
   style?: ViewStyle;
+  showBorder?: boolean;
 }
 
 const sizeMap: Record<AvatarSize, number> = {
-  sm: spacing.avatarSm,
-  md: spacing.avatarMd,
-  lg: spacing.avatarLg,
-  xl: spacing.avatarXl,
+  sm: spacing.avatarSm,   // 32
+  md: spacing.avatarMd,   // 48
+  lg: spacing.avatarLg,   // 72
+  xl: spacing.avatarXl,   // 100
 };
 
 const fontSizeMap: Record<AvatarSize, number> = {
@@ -27,20 +28,33 @@ const fontSizeMap: Record<AvatarSize, number> = {
   xl: 38,
 };
 
+const borderWidthMap: Record<AvatarSize, number> = {
+  sm: 2,
+  md: 2,
+  lg: 3,
+  xl: 3,
+};
+
 /** Returns the first letter of a display name for the fallback placeholder */
 function getInitials(name?: string): string {
   if (!name) return '?';
   return name.trim().charAt(0).toUpperCase();
 }
 
-export function Avatar({ uri, displayName, size = 'md', style }: AvatarProps) {
+export function Avatar({ uri, displayName, size = 'md', style, showBorder = true }: AvatarProps) {
   const dimension = sizeMap[size];
+  const bw = borderWidthMap[size];
 
   return (
     <View
       style={[
         styles.container,
-        { width: dimension, height: dimension, borderRadius: dimension / 2 },
+        {
+          width: dimension,
+          height: dimension,
+          borderRadius: dimension / 2,
+          borderWidth: showBorder ? bw : 0,
+        },
         style,
       ]}
     >
@@ -65,6 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    borderColor: colors.primaryContainer, // #ccf05f — soft glow border
   },
   image: {
     width: '100%',

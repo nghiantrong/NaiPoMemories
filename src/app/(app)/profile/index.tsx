@@ -1,12 +1,18 @@
-import { Header } from '@/components/layout/Header';
-import { ScreenContainer } from '@/components/layout/ScreenContainer';
+import { View, StyleSheet } from 'react-native';
 import { ProfileContent } from '@/features/profile/components/ProfileContent';
+import { colors } from '@/theme/colors';
 
 export default function ProfileScreen() {
   return (
-    <ScreenContainer padded={false} edges={['top']}>
-      <Header title="Profile" />
+    <View style={styles.container}>
       <ProfileContent />
-    </ScreenContainer>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+});

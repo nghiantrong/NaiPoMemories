@@ -32,21 +32,26 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
   ref,
 ) {
   const [isFocused, setIsFocused] = useState(false);
-  const borderColor = useSharedValue<string>(colors.outlineVariant);
+  const borderWidth = useSharedValue<number>(0);
+  const bgColor = useSharedValue<string>(colors.surfaceContainerLow);
 
-  const animatedBorderStyle = useAnimatedStyle(() => ({
-    borderColor: borderColor.value,
+  const animatedWrapperStyle = useAnimatedStyle(() => ({
+    borderWidth: borderWidth.value,
+    borderColor: error ? colors.error : colors.primary,
+    backgroundColor: bgColor.value,
   }));
 
   const handleFocus = (e: Parameters<NonNullable<TextInputProps['onFocus']>>[0]) => {
     setIsFocused(true);
-    borderColor.value = withSpring(colors.primary as string, { damping: 15 });
+    borderWidth.value = withSpring(2, { damping: 20, stiffness: 300 });
+    bgColor.value = colors.white;
     onFocus?.(e);
   };
 
   const handleBlur = (e: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
     setIsFocused(false);
-    borderColor.value = withSpring((error ? colors.error : colors.outlineVariant) as string, { damping: 15 });
+    borderWidth.value = withSpring(error ? 1.5 : 0, { damping: 20, stiffness: 300 });
+    bgColor.value = colors.surfaceContainerLow;
     onBlur?.(e);
   };
 
@@ -57,8 +62,8 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       <Animated.View
         style={[
           styles.inputWrapper,
-          animatedBorderStyle,
-          error && styles.inputError,
+          error && !isFocused && styles.inputError,
+          animatedWrapperStyle,
         ]}
       >
         {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
@@ -94,19 +99,19 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.labelLg,
-    color: colors.onSurface,
+    color: colors.secondary,
+    marginLeft: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surfaceContainerLow,
     borderRadius: borderRadius.lg,
-    borderWidth: 1.5,
-    borderColor: colors.outlineVariant,
     minHeight: 52,
     overflow: 'hidden',
   },
   inputError: {
+    borderWidth: 1.5,
     borderColor: colors.error,
   },
   input: {
@@ -117,11 +122,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.inputPaddingVertical,
   },
   inputWithLeftIcon: {
-    paddingLeft: 0,
+    paddingLeft: spacing.sm,
   },
   iconLeft: {
     paddingLeft: spacing.md,
-    paddingRight: spacing.sm,
+    paddingRight: spacing.xs,
   },
   iconRight: {
     paddingRight: spacing.md,
@@ -130,9 +135,11 @@ const styles = StyleSheet.create({
   errorText: {
     ...typography.labelMd,
     color: colors.error,
+    marginLeft: 4,
   },
   hintText: {
     ...typography.labelMd,
     color: colors.onSurfaceVariant,
+    marginLeft: 4,
   },
 });

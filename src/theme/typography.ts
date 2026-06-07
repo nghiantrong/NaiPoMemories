@@ -1,5 +1,3 @@
-import { Platform } from 'react-native';
-
 /**
  * NaiPoMemories Typography Tokens
  * Headlines: Quicksand | Body & Labels: Nunito Sans
@@ -7,31 +5,13 @@ import { Platform } from 'react-native';
  */
 
 export const fontFamilies = {
-  headlineBold: Platform.select({
-    ios: 'Quicksand-Bold',
-    android: 'Quicksand-Bold',
-    default: 'Quicksand-Bold',
-  }),
-  headlineSemiBold: Platform.select({
-    ios: 'Quicksand-SemiBold',
-    android: 'Quicksand-SemiBold',
-    default: 'Quicksand-SemiBold',
-  }),
-  bodyRegular: Platform.select({
-    ios: 'NunitoSans-Regular',
-    android: 'NunitoSans-Regular',
-    default: 'NunitoSans-Regular',
-  }),
-  bodySemiBold: Platform.select({
-    ios: 'NunitoSans-SemiBold',
-    android: 'NunitoSans-SemiBold',
-    default: 'NunitoSans-SemiBold',
-  }),
-  bodyBold: Platform.select({
-    ios: 'NunitoSans-Bold',
-    android: 'NunitoSans-Bold',
-    default: 'NunitoSans-Bold',
-  }),
+  headlineBold: 'Quicksand-Bold',
+  headlineSemiBold: 'Quicksand-SemiBold',
+  headlineMedium: 'Quicksand-Medium',
+  bodyRegular: 'NunitoSans-Regular',
+  bodySemiBold: 'NunitoSans-SemiBold',
+  bodyBold: 'NunitoSans-Bold',
+  bodyExtraBold: 'NunitoSans-ExtraBold',
 } as const;
 
 export const typography = {

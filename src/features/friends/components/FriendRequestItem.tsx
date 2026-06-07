@@ -1,11 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { spacing } from '@/theme/spacing';
-import { borderRadius } from '@/theme/spacing';
+import { spacing, borderRadius } from '@/theme/spacing';
 import { shadows } from '@/theme/shadows';
 import { FriendRequest } from '../types/friend.types';
 import { UserDocument } from '@/features/profile/types/user.types';
@@ -36,27 +34,17 @@ export function FriendRequestItem({
       />
       <View style={styles.info}>
         <Text style={styles.name}>
-          {senderProfile?.displayName ?? 'Unknown'}
+          {senderProfile?.displayName ?? 'Người dùng'}
         </Text>
         <Text style={styles.email}>{senderProfile?.email ?? ''}</Text>
-        <View style={styles.actions}>
-          <Button
-            label="Accept"
-            size="sm"
-            variant="primary"
-            onPress={onAccept}
-            isLoading={isAccepting}
-            style={styles.actionBtn}
-          />
-          <Button
-            label="Reject"
-            size="sm"
-            variant="outline"
-            onPress={onReject}
-            isLoading={isRejecting}
-            style={styles.actionBtn}
-          />
-        </View>
+      </View>
+      <View style={styles.actions}>
+        <Pressable style={styles.acceptBtn} onPress={onAccept}>
+          <Text style={styles.acceptText}>✓</Text>
+        </Pressable>
+        <Pressable style={styles.rejectBtn} onPress={onReject}>
+          <Text style={styles.rejectText}>✕</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -65,8 +53,8 @@ export function FriendRequestItem({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.surfaceContainerLowest,
+    alignItems: 'center',
+    backgroundColor: colors.surfaceContainerLow,
     borderRadius: borderRadius.lg,
     padding: spacing.cardPadding,
     gap: spacing.md,
@@ -74,23 +62,44 @@ const styles = StyleSheet.create({
   },
   info: {
     flex: 1,
-    gap: spacing.xs,
+    gap: 2,
   },
   name: {
-    ...typography.bodyMd,
+    ...typography.labelLg,
     color: colors.onSurface,
-    fontWeight: '600',
   },
   email: {
-    ...typography.labelMd,
+    ...typography.labelSm,
     color: colors.onSurfaceVariant,
   },
   actions: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginTop: spacing.sm,
   },
-  actionBtn: {
-    flex: 1,
+  acceptBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  acceptText: {
+    fontSize: 18,
+    color: colors.onPrimaryContainer,
+    fontWeight: '700',
+  },
+  rejectBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surfaceContainerHigh,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rejectText: {
+    fontSize: 16,
+    color: colors.onSurfaceVariant,
+    fontWeight: '700',
   },
 });

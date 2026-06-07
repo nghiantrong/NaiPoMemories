@@ -44,13 +44,31 @@ export const shadows = {
     elevation: 8,
   },
 
-  // Floating tab bar "island"
+  // Floating tab bar "island" — matcha shadow downward
   tabBar: {
     shadowColor: matchaShadowColor,
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
-    shadowRadius: 20,
+    shadowRadius: 24,
     elevation: 10,
+  },
+
+  // Camera shutter glow
+  shutterGlow: {
+    shadowColor: matchaShadowColor,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+
+  // Moment card shadow
+  card: {
+    shadowColor: matchaShadowColor,
+    shadowOffset: { width: 0, height: 24 },
+    shadowOpacity: 0.15,
+    shadowRadius: 48,
+    elevation: 6,
   },
 } as const;
 
