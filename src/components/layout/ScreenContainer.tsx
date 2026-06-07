@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, ViewStyle, ScrollViewProps } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
+import { styles } from './ScreenContainer.styles';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -46,23 +47,3 @@ export function ScreenContainer({
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  padded: {
-    paddingHorizontal: spacing.screenPaddingHorizontal,
-    paddingVertical: spacing.screenPaddingVertical,
-  },
-});

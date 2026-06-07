@@ -6,6 +6,7 @@ import { typography } from '@/theme/typography';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { shadows } from '@/theme/shadows';
 import { FriendWithProfile } from '../types/friend.types';
+import { styles } from './FriendCard.styles';
 
 interface FriendCardProps {
   friend: FriendWithProfile;
@@ -26,38 +27,3 @@ export function FriendCard({ friend, onPress }: FriendCardProps) {
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceContainerLow,
-    borderRadius: borderRadius.lg,
-    padding: spacing.cardPadding,
-    gap: spacing.md,
-    ...shadows.sm,
-  },
-  info: {
-    flex: 1,
-    gap: 2,
-  },
-  name: {
-    ...typography.labelLg,
-    color: colors.onSurface,
-  },
-  email: {
-    ...typography.labelSm,
-    color: colors.onSurfaceVariant,
-  },
-  badge: {
-    backgroundColor: colors.primaryContainer,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
-  },
-  badgeText: {
-    ...typography.labelSm,
-    color: colors.onPrimaryContainer,
-    fontWeight: '700',
-  },
-});

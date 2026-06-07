@@ -3,6 +3,7 @@ import { View, Image, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors } from '@/theme/colors';
 import { borderRadius, spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
+import { styles } from './Avatar.styles';
 
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -72,22 +73,3 @@ export function Avatar({ uri, displayName, size = 'md', style, showBorder = true
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    borderColor: colors.primaryContainer, // #ccf05f — soft glow border
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  initials: {
-    ...typography.headlineMd,
-    color: colors.onPrimaryContainer,
-    fontWeight: '700',
-  },
-});

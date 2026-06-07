@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { routes } from '@/constants/routes';
 import { colors } from '@/theme/colors';
+import { styles } from './register.styles';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -15,10 +16,3 @@ export default function RegisterScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-});

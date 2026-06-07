@@ -14,8 +14,7 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFeed } from '../hooks/useFeed';
 import { PostCard } from './PostCard';
-
-const APP_BAR_HEIGHT = 68;
+import { styles, APP_BAR_HEIGHT } from './FeedList.styles';
 
 interface FeedListProps {
   userId: string;
@@ -97,57 +96,3 @@ export function FeedList({ userId }: FeedListProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-
-  // Transparent app bar
-  appBarWrapper: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    overflow: 'hidden',
-  },
-  appBar: {
-    height: APP_BAR_HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.screenPaddingHorizontal,
-  },
-  appBarTitle: {
-    // Stitch: font-headline-lg-mobile (Quicksand 28px 700) text-primary
-    ...typography.headlineLg,
-    color: colors.primary,
-  },
-  appBarAction: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  appBarActionText: {
-    fontSize: 18,
-  },
-  avatarRing: {
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-
-  // List
-  listContent: {
-    paddingHorizontal: spacing.screenPaddingHorizontal,
-    gap: spacing.lg,
-  },
-  separator: {
-    height: spacing.lg,
-  },
-});

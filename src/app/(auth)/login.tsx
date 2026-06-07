@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { routes } from '@/constants/routes';
 import { colors } from '@/theme/colors';
+import { styles } from './login.styles';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -15,10 +16,3 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-});

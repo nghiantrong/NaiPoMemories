@@ -1,6 +1,7 @@
 import { View, StyleSheet } from 'react-native';
 import { ProfileContent } from '@/features/profile/components/ProfileContent';
 import { colors } from '@/theme/colors';
+import { styles } from './index.styles';
 
 export default function ProfileScreen() {
   return (
@@ -9,10 +10,3 @@ export default function ProfileScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-});
