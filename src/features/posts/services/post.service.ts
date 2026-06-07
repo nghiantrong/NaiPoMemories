@@ -79,5 +79,17 @@ export const postService = {
       throw parseFirebaseError(error, 'feed');
     }
   },
+
+  /**
+   * Fetch a single user's posts
+   */
+  async getUserPosts(userId: string): Promise<Post[]> {
+    try {
+      return await postRepository.getPostsByUser(userId);
+    } catch (error) {
+      console.error('[PostService] getUserPosts error:', error);
+      throw parseFirebaseError(error, 'user posts');
+    }
+  },
 };
 

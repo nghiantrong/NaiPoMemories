@@ -49,6 +49,26 @@ export const styles = StyleSheet.create({
     ...typography.labelMd,
     color: colors.onSurfaceVariant,
   },
+  postsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  gridItem: {
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: borderRadius.md,
+  },
+  videoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: borderRadius.md,
+  },
+  videoIcon: {
+    fontSize: 24,
+    opacity: 0.9,
+  },
 
   actions: {
     paddingHorizontal: spacing.screenPaddingHorizontal,
